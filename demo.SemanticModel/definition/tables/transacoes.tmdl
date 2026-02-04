@@ -7,20 +7,48 @@ table transacoes
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	column ID
-		dataType: double
-		displayFolder: Colunas
-		lineageTag: d957ebb9-27f9-40b6-8428-882cc3350058
-		summarizeBy: count
-		sourceColumn: ID
+	measure 'Cotação corrigida' = ```
+			
+			
+			VAR __DataCtx = MAX(calendario[Data]) 
+			
+			VAR __UltimaDataComCotacao = 
+			    CALCULATE(
+			        LASTNONBLANK(calendario[Data], [Cotação do dia]),
+			        calendario[Data] <= __DataCtx
+			    )
+			
+			RETURN
+			    CALCULATE(
+			        [Cotação do dia],
+			        calendario[Data] = __UltimaDataComCotacao
+			    )
+			
+			```
+		displayFolder: Medidas
+		lineageTag: 843baf86-0564-4fee-9bff-e7f23ac82a15
 
-		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total R$' = ```
+			
+			SUMX(
+			    moedas,
+			    SUMX(
+			        calendario,
+			        COALESCE([Cotação corrigida], 1) * [Valor Total] 
+			    )
+			) 
+			
+			```
+		displayFolder: Medidas
+		lineageTag: 66eabdbe-a6e0-4798-88ca-4902a84bfa0b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column Data
 		dataType: dateTime
-		formatString: Long Date
+		formatString: dd/mm/yyyy
 		displayFolder: Colunas
 		lineageTag: 16b6c2f4-0506-470e-b367-42a524eac4c6
 		summarizeBy: none
@@ -29,6 +57,8 @@ table transacoes
 		annotation SummarizationSetBy = Automatic
 
 		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
 
 	column Total
 		dataType: double
@@ -55,20 +85,23 @@ table transacoes
 		queryGroup: Facto
 		source = ```
 				let
-				    source = Excel.Workbook(
-				        File.Contents(base_transacoes), 
-				        true, 
-				        null
-				    ),
+				    // Tente abrir a primeira planilha
+				    source = Excel.Workbook(File.Contents(base_transacoes), null, true),
 				    
-				    transacoes_Table = source{[Item="transacoes",Kind="Table"]}[Data],
+				    // Pegue a primeira planilha disponível
+				    firstSheet = source{[Item="transacoes",Kind="Sheet"]}[Data],
 				    
-				    datesRestricted = Table.SelectRows(
-				        transacoes_Table, 
-				        each [Data] >= data_inicial and [Data] <= data_final
-				    )
+				    // Ou se não existir com esse nome, pegue a primeira de qualquer jeito
+				    fallbackSheet = if firstSheet = null then 
+				                       source{0}[Data]
+				                    else firstSheet,
+				    
+				    // Promova a primeira linha como cabeçalho
+				    promotedHeaders = Table.PromoteHeaders(fallbackSheet, [PromoteAllScalars=true]),
+				    #"Colunas Removidas" = Table.RemoveColumns(promotedHeaders,{"ID"}),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Colunas Removidas",{{"Data", type date}, {"Total", type number}, {"Moeda", type text}})
 				in
-				    datesRestricted
+				    #"Tipo Alterado"
 				```
 
 	annotation PBI_NavigationStepName = Navegação

@@ -6,7 +6,7 @@ expression base_transacoes = "C:\inetpub\youtube-20241111-git-github-main\transa
 
 	annotation PBI_ResultType = Text
 
-expression data_inicial = #date(2025, 11, 1) meta [IsParameterQuery=true, Type="Date", IsParameterQueryRequired=true]
+expression data_inicial = #date(2024, 11, 1) meta [IsParameterQuery=true, Type="Date", IsParameterQueryRequired=true]
 	lineageTag: d112a73d-2f63-408b-a682-1822a0e14a9a
 	queryGroup: Prametros
 
@@ -103,7 +103,7 @@ expression getCotacoes = ```
 
 	annotation PBI_ResultType = Function
 
-expression data_final = DateTime.Date(DateTime.LocalNow())
+expression data_final = Date.AddYears(DateTime.Date(DateTime.LocalNow()), -1)
 	lineageTag: cde79e12-af7a-47ca-b3eb-b1aefe424dee
 	queryGroup: Prametros
 

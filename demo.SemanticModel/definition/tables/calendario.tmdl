@@ -5,7 +5,7 @@ table calendario
 	column Data
 		dataType: dateTime
 		isKey
-		formatString: Long Date
+		formatString: dd/mm/yyyy
 		lineageTag: 75a2548f-3582-4178-a9a3-46398bec0bd5
 		summarizeBy: none
 		sourceColumn: Data
@@ -13,6 +13,8 @@ table calendario
 		annotation SummarizationSetBy = Automatic
 
 		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
 
 	column Ano
 		dataType: int64

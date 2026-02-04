@@ -4,10 +4,10 @@
   "position": {
     "x": 27.098381070983812,
     "y": 52.6027397260274,
-    "z": 1,
+    "z": 1000,
     "height": 350.68493150684935,
     "width": 170.56039850560398,
-    "tabOrder": 1
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "slicer",
@@ -81,7 +81,7 @@
                           [
                             {
                               "Literal": {
-                                "Value": "'USD'"
+                                "Value": "'EUR'"
                               }
                             }
                           ]
@@ -101,7 +101,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "e543309a4878a4d3e0f5",
+        "name": "f0d957e4deae9993ac30",
         "field": {
           "Column": {
             "Expression": {
